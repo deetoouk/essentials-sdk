@@ -62,7 +62,7 @@ class GuzzleClient implements Client
             if ((json_last_error() == JSON_ERROR_NONE)) {
                 return $decodedResponse;
             } else {
-                throw new ResponseException('Unexpected error! Response not valid JSON!');
+                throw new ResponseException('Unexpected error! Response not valid JSON:'.$contents);
             }
         } catch (GuzzleClientException $e) {
             $response = $e->getResponse();
