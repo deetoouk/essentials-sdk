@@ -41,6 +41,7 @@ class GuzzleClient implements Client
      * @throws ResponseException
      * @throws ServerException
      * @throws UnauthorizedException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function request($verb, $url, array $request = [], array $headers = [])
     {
@@ -73,23 +74,23 @@ class GuzzleClient implements Client
 
                 throw new ErrorException(
                     $responseContent['error'],
-                    !empty($responseContent['code']) ? $responseContent['code'] : 0
+                    !empty($responseContent['code']) ? $responseContent['code'] : 0,
                 );
             } elseif ($response->getStatusCode() === 401) {
-                throw new UnauthorizedException($contents);
+                throw new UnauthorizedException($contents, 0, $e);
             } elseif ($response->getStatusCode() === 404) {
-                throw new ResponseException('Resource not found! Check your host!');
+                throw new ResponseException('Resource not found! Check your host!', 0, $e);
             } else {
-                throw new ResponseException('Unexpected error! Invalid response code!');
+                throw new ResponseException('Unexpected error! Invalid response code!', 0, $e);
             }
         } catch (GuzzleServerException $e) {
             if ($e->getCode() == 503) {
                 throw new ErrorException('System in maintenance mode!');
             }
 
-            throw new ServerException('Unexpected error! Please contact us for more information!');
+            throw new ServerException('Unexpected error! Please contact us for more information!', $e->getCode(), $e);
         } catch (Exception $e) {
-            throw new ResponseException($e->getMessage(), $e->getCode());
+            throw new ResponseException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
