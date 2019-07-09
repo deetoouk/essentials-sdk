@@ -4,6 +4,7 @@ use JTDSoft\EssentialsSdk\Contracts\Client;
 use JTDSoft\EssentialsSdk\Exceptions\ErrorException;
 use JTDSoft\EssentialsSdk\Exceptions\ResponseException;
 use JTDSoft\EssentialsSdk\Exceptions\ServerException;
+use JTDSoft\EssentialsSdk\Exceptions\ServiceUnavailableException;
 use JTDSoft\EssentialsSdk\Exceptions\UnauthorizedException;
 use Exception;
 use GuzzleHttp\Client as Guzzle;
@@ -40,6 +41,7 @@ class GuzzleClient implements Client
      * @throws ErrorException
      * @throws ResponseException
      * @throws ServerException
+     * @throws ServiceUnavailableException
      * @throws UnauthorizedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -85,7 +87,7 @@ class GuzzleClient implements Client
             }
         } catch (GuzzleServerException $e) {
             if ($e->getCode() == 503) {
-                throw new ErrorException('System in maintenance mode!');
+                throw new ServiceUnavailableException('System in maintenance mode!');
             }
 
             throw new ServerException('Unexpected error! Please contact us for more information!', $e->getCode(), $e);
